@@ -7,12 +7,10 @@ const listingSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     location: { type: String, required: true },
     category: { type: String, required: true },
-    images: [{ type: String }], // Array of image URLs
+    imageUrl: { type: String, required: true }, // Store the AWS S3 image URL
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
 
-const Listing = mongoose.model("Listing", listingSchema);
-
-export default Listing;
+export default mongoose.model("Listing", listingSchema);
