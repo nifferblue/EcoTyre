@@ -20,23 +20,21 @@ const DashboardLayout = ({ children }) => (
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      {/* Move AuthProvider inside Router */}
+      <AuthProvider> 
         <Routes>
-          {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-
-          {/* Protected Dashboard Routes (With Sidebar) */}
           <Route path="/dashboard" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
           <Route path="/listings" element={<DashboardLayout><MyListings /></DashboardLayout>} />
           <Route path="/messages" element={<DashboardLayout><Messages /></DashboardLayout>} />
           <Route path="/schedules" element={<DashboardLayout><CollectionSchedule /></DashboardLayout>} />
           <Route path="/account" element={<DashboardLayout><Account /></DashboardLayout>} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

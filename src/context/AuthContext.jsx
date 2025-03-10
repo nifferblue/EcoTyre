@@ -1,67 +1,44 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../firebase";
-import { 
-  onAuthStateChanged, 
-  signOut, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword 
-} from "firebase/auth";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-// Create Auth Context
+// Create Context
 const AuthContext = createContext();
 
-// Auth Provider Component
+// AuthProvider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Listen for authentication state changes
+  // Simulate checking authentication from localStorage
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsubscribe(); // Cleanup listener
+    const token = localStorage.getItem("token");
+    if (token) {
+      setUser({ token }); // Simulate user data
+    }
   }, []);
 
-  // Signup function
-  const signup = async (email, password) => {
-    try {
-      setError(null); // Reset errors before attempting signup
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      setError(err.message);
-    }
+  // Login Function
+  const login = (userData) => {
+    localStorage.setItem("token", userData.token);
+    setUser(userData);
+    navigate("/dashboard"); // Redirect after login
   };
 
-  // Login function
-  const login = async (email, password) => {
-    try {
-      setError(null); // Reset errors before attempting login
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  // Logout function
-  const logout = async () => {
-    try {
-      await signOut(auth);
-    } catch (err) {
-      setError(err.message);
-    }
+  // Logout Function
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/login"); // Redirect to login after logout
   };
 
   return (
-    <AuthContext.Provider value={{ user, signup, login, logout, error }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to use AuthContext
+// Custom Hook to use Auth
 export const useAuth = () => {
   return useContext(AuthContext);
 };

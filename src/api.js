@@ -1,51 +1,20 @@
-const API_URL = "http://localhost:5000/api/users"; // Update if backend is deployed
+import axios from "axios";
 
-// Login Function
-export const loginUser = async (email, password) => {
-  try {
-    const response = await fetch(`${API_URL}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+// Create an Axios instance with a base URL
+const API = axios.create({ baseURL: "http://localhost:5000/api" });
 
-    const data = await response.json();
+// Authentication API requests
+export const registerUser = (userData) => API.post("/users/register", userData);
+export const loginUser = (userData) => API.post("/users/login", userData);
 
-    if (!response.ok) {
-      throw new Error(data.error || "Login failed");
-    }
+// Listings API requests
+export const createListing = (listingData, token) =>
+  API.post("/listings", listingData, { headers: { Authorization: `Bearer ${token}` } });
 
-    // Store token in localStorage (or sessionStorage)
-    localStorage.setItem("token", data.token);
-    return data; // Return user data
-  } catch (error) {
-    console.error("Login error:", error.message);
-    throw error;
-  }
-};
+export const getListings = () => API.get("/listings"); // Fetch all listings
+export const getListingById = (id) => API.get(`/listings/${id}`); // Fetch a single listing
+export const deleteListing = (id, token) =>
+  API.delete(`/listings/${id}`, { headers: { Authorization: `Bearer ${token}` } });
 
-// Register Function
-export const registerUser = async (userData) => {
-  try {
-    const response = await fetch(`${API_URL}/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Registration failed");
-    }
-
-    return data;
-  } catch (error) {
-    console.error("Registration error:", error.message);
-    throw error;
-  }
-};
+export const updateListing = (id, listingData, token) =>
+  API.put(`/listings/${id}`, listingData, { headers: { Authorization: `Bearer ${token}` } });
